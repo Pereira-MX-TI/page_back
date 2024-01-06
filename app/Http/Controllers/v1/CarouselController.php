@@ -6,11 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Blocktrail\CryptoJSAES\CryptoJSAES;
 use App\Http\Controllers\ValidatorController;
-use Illuminate\Support\Facades\DB;
 use App\Models\v1\CarouselH;
 use App\Models\v1\Product;
 use App\Models\v1\File;
-
 use App\Http\Resources\v1\CarouselResource;
 use App\Http\Resources\v1\ProductResource;
 
@@ -38,18 +36,15 @@ class CarouselController extends Controller
                 ];
             }
 
-            array_push($list,$newDetail);
+            $list[] = $newDetail;
         }
 
         return $list;
     }
 
     public function getListCarousel(Request $request)
-    {    
-        $validation = ValidatorController::validatorGral($request,
-        [   
-            'listId' => 'required'
-        ],1);
+    {
+        $validation = ValidatorController::validatorGral($request, ['listId' => 'required'],1);
 
         if($validation['code']!=200)
             return response()->json($validation,$validation['code']);
@@ -62,9 +57,9 @@ class CarouselController extends Controller
     }
 
     public function getCarousel(Request $request)
-    {    
+    {
         $validation = ValidatorController::validatorGral($request,
-        [   
+        [
             'id' => 'required'
         ],1);
 
@@ -79,7 +74,7 @@ class CarouselController extends Controller
     }
 
     public function getPublicity(Request $request)
-    {    
+    {
         $validation = ValidatorController::validatorGral($request,[],1);
 
         if($validation['code']!=200)
@@ -92,7 +87,7 @@ class CarouselController extends Controller
         {
             if(count($data['listProduct'])!=0)
             {
-    
+
                 $publicity['carrousel1']= ProductResource::collection(
                     Product::with('brand','messuare','category','material')->
                     whereNotIn("id",$data['listProduct'])->
@@ -108,10 +103,10 @@ class CarouselController extends Controller
                     where([['estatus_crud','C'],['is_web',1],['category_id',8]])->
                     limit(12)->
                     orderBy('nombre',rand(0,1)==1?'ASC':'DESC')->get()
-                ); 
+                );
             }
         }
-                
+
         return response()->json(["data" => CryptoJSAES::encrypt(json_encode($publicity), strval(env('APP_KEY')))], 200);
     }
 }
