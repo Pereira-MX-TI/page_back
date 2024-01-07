@@ -47,7 +47,11 @@ Route::prefix('v1/common')->middleware(['jwt.auth','validationToken','cors'])->g
 
 
 //TODO: Cambios al front que agregue auth
-Route::prefix('v1/auth')->middleware(['jwt.auth','validationToken','cors'])->group(static function () {
-    Route::get('login',[Token::class,'login']);
+Route::prefix('v1/auth')->middleware([])->group(static function () {
+
+    // TODO: Cambio de get a post
+    Route::post('login',[Token::class,'login'])
+        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+
     Route::post('logout',[Token::class,'logout']);
 });

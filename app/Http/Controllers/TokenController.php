@@ -2,88 +2,88 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
+use App\Exceptions\CustomException;
+use App\Http\Helpers\BuildData;
+use App\Repository\UserRepository;
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Token;
-use App\Models\Response;
 
-use Blocktrail\CryptoJSAES\CryptoJSAES;
+use Symfony\Component\HttpFoundation\Response as ResponseHttp;
 
 class TokenController extends Controller
 {
-    public function __construct()
+
+    private $userRepository;
+
+    public function __construct(UserRepository $userRepository)
     {
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->userRepository = $userRepository;
     }
 
     public function login(Request $request)
-    {    
-        $validation = ValidatorController::validatorGral($request,
-        [   
-            'email' => 'required|email',
-            'password' => 'required',
-            'device' => 'required'
-        ],1);
-
-        if($validation['code']!=200)
-            return response()->json($validation,$validation['code']);
-
-        $data = $validation['data'];
-        $user = User::with('type_user')->where([['email', $data['email']],['is_active',1]])->orderBy('id', 'DESC')->get();
-            
-        if(count($user)==0)
-        {
-            $code = Response::where('code', '404')->get()->first();
-            return response()->json($code, $code['code']);
-        }
-
-        $user = $user[0];
-        $token = auth()->attempt(['email'=>$data['email'],'password'=>$data['password']]);
-
-        if ($token) 
-        {
-            if($user['Type_user']['id']!=4)
-            {
-                $tokenEnable = Token::where([['user_id',$user['id']],['is_active',1]])->orderBy('id','DESC')->get();
-
-                if(count($tokenEnable)>=2)
-                {
-                    $tokenEnable = $tokenEnable[0];
-                    Token::where([['user_id',$user['id']],['is_active',1],['id','!=',$tokenEnable['id']]])->update(['is_active'=>0]);
-                }
-            }
-
-            $token = CryptoJSAES::encrypt(json_encode($token),strval(env('APP_KEY')));
-            Token::create([
-                'data'     => $token,
-                'user_id'  => $user['id'],
-                'device'   => $data['device'],
-                'is_active'=> 1
+    {
+        try {
+            ValidatorController::validatorData($request->info, [
+                'email' => 'required|email',
+                'password' => 'required',
+                'device' => 'required'
             ]);
 
-            $data = [
-                'token' => $token,
-                'user' => [
-                    "id"=> $user['id'],
-                    "name"=> $user['name'],
-                    "email"=> $user['email'],
-                    "type_user" => $user['type_user']
-                ]
-            ];
+            $data = $request->info;
+            $user = $this->userRepository->getUser($data);
 
-            return response()->json(["data" => CryptoJSAES::encrypt(json_encode($data), strval(env('APP_KEY')))], 200);
-        }
-        else 
-        {
-            $code = Response::where('code', '401')->get()->first();
-            return response()->json($code, $code['code']);
+            if (!$user) {
+                throw new CustomException('Email or password invalid', 420);
+            }
+            $token = auth()->attempt(['email' => $data->email, 'password' => $data->password]);
+
+            if (!$token) {
+                throw new CustomException('Email or password invalid', 420);
+            }
+
+            // Manager tokens
+            $this->managerTokens($user,$token,$data);
+
+                return response([
+                    'message' => 'Inicio de sesión exitoso',
+                    'info' => BuildData::BuildDataLogin($token, $user),
+                ], ResponseHttp::HTTP_OK);
+        } catch (CustomException $e) {
+            return response([
+                'message' => $e->getMessage()
+            ], $e->getCode());
         }
     }
 
     public function logout()
     {
         auth()->logout();
-        return response()->json(['message' => 'User successfully logged out.']);
+        return response([
+            'message' => 'User successfully logged out.'
+        ], ResponseHttp::HTTP_OK);
+    }
+
+
+    private function managerTokens(Object $user,$token,$data)
+    {
+        if ($user['Type_user']['id'] != 4) {
+            $tokenEnable = Token::where([['user_id', $user['id']], ['is_active', 1]])
+                ->orderBy('id', 'DESC')
+                ->get();
+
+            if (count($tokenEnable) >= 2) {
+                $tokenEnable = $tokenEnable[0];
+                Token::where([['user_id', $user['id']], ['is_active', 1], ['id', '!=', $tokenEnable['id']]])
+                    ->update(['is_active' => 0]);
+            }
+        }
+
+        Token::create([
+            'data' => $token,
+            'user_id' => $user['id'],
+            'device' => $data->device,
+            'is_active' => 1
+        ]);
     }
 }
