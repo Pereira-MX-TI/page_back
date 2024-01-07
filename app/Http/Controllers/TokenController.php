@@ -45,10 +45,10 @@ class TokenController extends Controller
             // Manager tokens
             $this->managerTokens($user,$token,$data);
 
-                return response([
-                    'message' => 'Inicio de sesión exitoso',
-                    'info' => BuildData::BuildDataLogin($token, $user),
-                ], ResponseHttp::HTTP_OK);
+            return response([
+                'message' => 'Successfully logged in',
+                'info' => BuildData::BuildDataLogin($token, $user),
+            ], ResponseHttp::HTTP_OK);
         } catch (CustomException $e) {
             return response([
                 'message' => $e->getMessage()

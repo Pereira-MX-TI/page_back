@@ -85,11 +85,15 @@ class ValidatorController extends Controller
         $quantity = 0;
         if(isset($address_ip))
         {
-            $quantity = count(DB::connection('mysql2')->select("SELECT QW.id FROM quotation_web QW
-            INNER JOIN contact_web CW ON QW.client_web_id=CW.id
-            WHERE QW.created_at LIKE '%".date_format(date_create($currentTime),"Y-m-d")."%' AND
-            (CW.email = '".$contact['email']."' OR
-            QW.ip_address = '".$address_ip['ip']."')"));
+            $quantity = count(DB::connection('mysql2')
+                ->select(
+                    "SELECT QW.id FROM quotation_web QW
+                            INNER JOIN contact_web CW ON QW.client_web_id=CW.id
+                            WHERE QW.created_at LIKE '%".date_format(date_create($currentTime),"Y-m-d")."%' AND
+                            (CW.email = '".$contact['email']."' OR
+                            QW.ip_address = '".$address_ip['ip']."')"
+                        )
+                );
         }
         else
         {

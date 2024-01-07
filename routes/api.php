@@ -30,19 +30,38 @@ use App\Http\Controllers\v1\QuotatioWebController as QuotationWeb;
 //});
 
 // TODO: Cambio al front que agregue common
-Route::prefix('v1/common')->middleware(['jwt.auth','validationToken','cors'])->group(static function () {
+Route::prefix('v1/common')->middleware(['jwt.auth'])->group(static function () {
 
-    Route::get('getCarousel',           [Carousel::class,'getCarousel']);
-    Route::get('getListCarousel',       [Carousel::class,'getListCarousel']);
-    Route::get('getPublicity',          [Carousel::class,'getPublicity']);
+    Route::get('getCarousel', [Carousel::class,'getCarousel'])
+        ->middleware(['decryptData'/*,'encryptResponse'*/]);
 
-    Route::get('autoCompletedProduct',  [Product::class,'autoCompletedProduct']);
-    Route::get('getListProduct',        [Product::class,'getListProduct']);
-    Route::get('searchListProduct',     [Product::class,'searchListProduct']);
-    Route::get('getProduct',            [Product::class,'getProduct']);
+    Route::get('getListCarousel',[Carousel::class,'getListCarousel'])
+        ->middleware(['decryptData'/*,'encryptResponse'*/]);
 
-    Route::post('registerQuotationWeb',   [QuotationWeb::class,'registerQuotationWeb']);
-    Route::post('registerInfoServiceWeb', [QuotationWeb::class,'registerInfoServiceWeb']);
+    Route::get('getPublicity',[Carousel::class,'getPublicity'])
+        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+
+    Route::get('autoCompletedProduct',[Product::class,'autoCompletedProduct'])
+        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+
+    //TODO: revisar que funcione
+    Route::get('getListProduct',[Product::class,'getListProduct'])
+        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+
+    //TODO: Falta aun por revisar
+    Route::get('searchListProduct',[Product::class,'searchListProduct']);
+
+
+    Route::get('getProduct',[Product::class,'getProduct'])
+        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+
+    //TODO: revisar que funcione
+    Route::post('registerQuotationWeb',   [QuotationWeb::class,'registerQuotationWeb'])
+        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+
+    //TODO: revisar que funcione
+    Route::post('registerInfoServiceWeb', [QuotationWeb::class,'registerInfoServiceWeb'])
+        ->middleware(['decryptData'/*,'encryptResponse'*/]);
 });
 
 

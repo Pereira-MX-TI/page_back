@@ -17,9 +17,9 @@ class CarouselResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'description' => $this->description,
+            'id' => $this->id ?? null,
+            'name' => $this->name ?? null,
+            'description' => $this->description ?? null,
             'details' =>  CarouselController::detailCarousel(CarouselD::where('carousel_id',$this->id)->get())
         ];
     }
