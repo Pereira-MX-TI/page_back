@@ -21,7 +21,7 @@ class InfoServiceMail extends Mailable
     public function __construct($request_)
     {
         $this->request = $request_;
-        $this->subjet = "Solicitud de informacion en servicio";
+        $this->subjet = "Solicitud de información en servicio";
     }
 
     /**

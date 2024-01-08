@@ -15,12 +15,13 @@ class RequestService extends Model
         'ip_address',
         'name',
         'message',
-        'is_active'
+        'is_active',
+        'status'
     ];
 
     protected $hidden = [
         'is_active',
-        'created_at', 
+        'created_at',
         'updated_at'
     ];
 }

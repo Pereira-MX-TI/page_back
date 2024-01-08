@@ -31,10 +31,11 @@ class QuotatioWebController extends Controller
                 'contact.email' => 'required',
                 'contact.phone' => 'required',
                 'contact.cp' => 'required',
-                'ip_address' => 'required', // Opcional
-                'ip_address.ip' => 'required', // Opcional
+                'ip_address' => 'required',
+                'ip_address.ip' => 'required',
                 'listProduct' => 'required'
             ]);
+
 
             $data = $request->info;
             $validation = ValidatorController::validatorQuotationWeb($data->contact, $data->ip_address);
@@ -131,7 +132,7 @@ class QuotatioWebController extends Controller
             ]));
 
             return response()->json([
-                'message' => 'Successful query',
+                'message' => 'Successful Register Quotation Web',
                 'data' => $objFile
             ], ResponseHttp::HTTP_OK);
 
@@ -147,18 +148,20 @@ class QuotatioWebController extends Controller
         try {
             ValidatorController::validatorData($request->info, [
                 'contact' => 'required',
-                'contact.name' => 'required',
-                'contact.email' => 'required',
-                'contact.phone' => 'required',
-                'contact.cp' => 'required',
-                'ip_address' => 'required', // Opcional
-                'ip_address.ip' => 'required', // Opcional
-                'service' => 'required'
+                'contact.name' => 'required|string',
+                'contact.email' => 'required|email',
+                'contact.phone' => 'required|numeric',
+                'contact.cp' => 'required|numeric',
+                'contact.description' => 'required|string',
+                'ip_address' => 'required',
+                'ip_address.ip' => 'required',
+                'service' => 'required|string',
             ]);
 
             $data = $request->info;
 
             $validation = ValidatorController::validatorRequestInfoService($data->contact, $data->ip_address);
+
 
             if (!$validation){
                 throw new CustomException('Problem with consulta', 210);
@@ -168,6 +171,7 @@ class QuotatioWebController extends Controller
                 ->orderBy("id", "DESC")
                 ->first();
 
+
             if (isset($contact_web)) {
 
                 Contact::where('id', $contact_web['id'])
@@ -176,7 +180,6 @@ class QuotatioWebController extends Controller
                     'phone' => $data->contact['phone'],
                     'cp' => $data->contact['cp']
                 ]);
-
             } else {
 
                 Contact::create([
@@ -195,20 +198,22 @@ class QuotatioWebController extends Controller
             RequestService::create([
                 'contact_id' => $contact_web['id'],
                 'ip_address' => isset($data->ip_address) ? $data->ip_address['ip'] : '',
-                'name' => $data['service'],
-                'message' => $data['contact']['description'],
-                'is_active' => 1
+                'name' => $data->service,
+                'message' => $data->contact['description'],
+                'is_active' => 1,
+                'status' => 'P' //TODO: Que colocar en esta columna
             ]);
+
 
             Mail::to("solucionescomerciales_jmpf@outlook.com")
                 ->send(new InfoServiceMail([
                 'contact' => $contact_web,
-                'service' => $data['service'],
+                'service' => $data->service,
                 'message' => $data->contact['description']
             ]));
 
             return response()->json([
-                'message' => 'Successful query',
+                'message' => 'Successful Register Quotation Web',
                 'data' => $data
             ], ResponseHttp::HTTP_OK);
 

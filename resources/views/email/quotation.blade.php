@@ -7,7 +7,7 @@
     <title>Solicitud cotizacion</title>
 
     <style>
-        @page 
+        @page
         {
             margin: 0cm 0cm;
         }
@@ -36,9 +36,9 @@
     </style>
 </head>
 <body>
-    <img class="logo" src="{{ asset('files/default/datos_hidraulicas.png') }}"/>
+    <img class="logo" src=src="https://satia-prod.s3.amazonaws.com/default/soluciones.png" alt="logo"/>
     <br>
-    <h1>Solicitud de cotizacion</h1>
+    <h1>Solicitud de cotización</h1>
     <br>
 
     <label class="subtitle">Folio seguimiento: </label>
@@ -58,7 +58,7 @@
 
     <br>
     <p>
-        Es necessario revisar en el sistema en el apartado de cotizaciones web la solicitud de 
+        Es necesario revisar en el sistema en el apartado de cotizaciones web la solicitud de
         cotización generada en el sitio web con el folio de seguimiento {{$request['quotation']['id']}}
     </p>
 </body>

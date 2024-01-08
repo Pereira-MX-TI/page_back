@@ -98,7 +98,7 @@ class ProductController extends Controller
                 'opc' => 'required|integer',
                 'filters' => 'required|integer',
                 'quantity' => 'required|integer',
-                'orderby' => 'required'
+                'orderby' => 'required|string|in:ASC,DESC'
             ]);
 
             $data = $request->info;
@@ -115,7 +115,6 @@ class ProductController extends Controller
                         );
                     }
                     break;
-
                 case 1:
                     {
 

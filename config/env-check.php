@@ -29,7 +29,6 @@ return [
         'REDIS_HOST',
         'REDIS_PASSWORD',
         'REDIS_PORT',
-        'MAIL_MAILER',
         'MAIL_HOST',
         'MAIL_PORT',
         'MAIL_USERNAME',

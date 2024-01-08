@@ -5,38 +5,33 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitud de servicio</title>
-
     <style>
-        @page 
-        {
+        @page {
             margin: 0cm 0cm;
         }
-        body
-        {
+
+        body {
             width: 100vw;
             height:100vh;
         }
 
-        .logo
-        {
+        .logo {
             object-fit: contain;
             width:32%;
             height:130px;
         }
-        
-        .subtitle
-        {
+
+        .subtitle {
             font-weight: bolder;
         }
 
-        p
-        {
+        p {
             width:50%;
         }
     </style>
 </head>
 <body>
-    <img class="logo" src="{{ asset('files/default/datos_hidraulicas.png') }}"/>
+    <img class="logo" src="https://satia-prod.s3.amazonaws.com/default/soluciones.png" alt="logo"/>
     <br>
     <h1>Solicitud de información en {{$request['service']}}</h1>
     <br>
@@ -46,7 +41,7 @@
     <label class="subtitle">Correo: </label>
     <label>{{$request['contact']['email']}}</label>
     <br>
-    <label class="subtitle">Telefono: </label>
+    <label class="subtitle">Teléfono: </label>
     <label>{{$request['contact']['phone']}}</label>
     <br>
     <label class="subtitle">CP: </label>

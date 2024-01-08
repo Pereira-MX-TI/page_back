@@ -44,22 +44,18 @@ Route::prefix('v1/common')->middleware(['jwt.auth'])->group(static function () {
     Route::get('autoCompletedProduct',[Product::class,'autoCompletedProduct'])
         ->middleware(['decryptData'/*,'encryptResponse'*/]);
 
-    //TODO: revisar que funcione
     Route::get('getListProduct',[Product::class,'getListProduct'])
         ->middleware(['decryptData'/*,'encryptResponse'*/]);
 
     //TODO: Falta aun por revisar
     Route::get('searchListProduct',[Product::class,'searchListProduct']);
 
-
     Route::get('getProduct',[Product::class,'getProduct'])
         ->middleware(['decryptData'/*,'encryptResponse'*/]);
 
-    //TODO: revisar que funcione
     Route::post('registerQuotationWeb',   [QuotationWeb::class,'registerQuotationWeb'])
         ->middleware(['decryptData'/*,'encryptResponse'*/]);
 
-    //TODO: revisar que funcione
     Route::post('registerInfoServiceWeb', [QuotationWeb::class,'registerInfoServiceWeb'])
         ->middleware(['decryptData'/*,'encryptResponse'*/]);
 });
