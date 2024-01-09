@@ -33,31 +33,31 @@ use App\Http\Controllers\v1\QuotatioWebController as QuotationWeb;
 Route::prefix('v1/common')->middleware(['jwt.auth'])->group(static function () {
 
     Route::get('getCarousel', [Carousel::class,'getCarousel'])
-        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+        ->middleware(['decryptData','encryptResponse']);
 
     Route::get('getListCarousel',[Carousel::class,'getListCarousel'])
-        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+        ->middleware(['decryptData','encryptResponse']);
 
     Route::get('getPublicity',[Carousel::class,'getPublicity'])
-        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+        ->middleware(['decryptData','encryptResponse']);
 
     Route::get('autoCompletedProduct',[Product::class,'autoCompletedProduct'])
-        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+        ->middleware(['decryptData','encryptResponse']);
 
     Route::get('getListProduct',[Product::class,'getListProduct'])
-        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+        ->middleware(['decryptData','encryptResponse']);
 
-    //TODO: Falta aun por revisar
-    Route::get('searchListProduct',[Product::class,'searchListProduct']);
+    Route::get('searchListProduct',[Product::class,'searchListProduct'])
+        ->middleware(['decryptData','encryptResponse']);
 
     Route::get('getProduct',[Product::class,'getProduct'])
-        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+        ->middleware(['decryptData','encryptResponse']);
 
     Route::post('registerQuotationWeb',   [QuotationWeb::class,'registerQuotationWeb'])
-        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+        ->middleware(['decryptData','encryptResponse']);
 
     Route::post('registerInfoServiceWeb', [QuotationWeb::class,'registerInfoServiceWeb'])
-        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+        ->middleware(['decryptData','encryptResponse']);
 });
 
 
@@ -66,7 +66,7 @@ Route::prefix('v1/auth')->middleware([])->group(static function () {
 
     // TODO: Cambio de get a post
     Route::post('login',[Token::class,'login'])
-        ->middleware(['decryptData'/*,'encryptResponse'*/]);
+        ->middleware(['decryptData','encryptResponse']);
 
     Route::post('logout',[Token::class,'logout']);
 });

@@ -224,25 +224,23 @@ class ProductController extends Controller
     public function searchListProduct(Request $request)
     {
         try {
-            $validation = ValidatorController::validatorGral($request,
-                [
-                    'opc' => 'required',
-                    'search' => 'required',
-                    'quantity' => 'required',
-                    'filters' => 'required',
-                    'orderby' => 'required'
-                ], 1);
 
-            if ($validation['code'] != 200)
-                return response()->json($validation, $validation['code']);
+            ValidatorController::validatorData($request->info, [
+                'opc' => 'required|integer',
+                'search' => 'required|string',
+                'quantity' => 'required|integer',
+                'filters' => 'required',
+                'orderby' => 'required'
+            ]);
 
-            $data = $validation['data'];
+            $data = $request->info;
             $list = $quantity = $filters = null;
 
-            switch ($data['opc']) {
+            switch ($data->opc) {
                 case 0:
                     {
-                        $list = DB::connection('mysql2')->select("SELECT  P.id AS id
+                        $list = DB::connection('mysql2')
+                            ->select("SELECT  P.id AS id
                     FROM products AS P
                     INNER JOIN brands AS B ON P.brand_id=B.id
                     INNER JOIN materials AS M ON P.material_id=M.id
@@ -250,164 +248,155 @@ class ProductController extends Controller
                     INNER JOIN categories AS C ON P.category_id=C.id
                     WHERE P.estatus_crud='C' AND
                     P.is_web = 1 AND
-                    (P.id = '" . $data['search'] . "' OR
-                     P.nombre  LIKE '%" . $data['search'] . "%' OR
-                    (M.nombre  LIKE '%" . $data['search'] . "%' AND M.estatus_crud='C') OR
-                    (B.nombre  LIKE '%" . $data['search'] . "%' AND B.estatus_crud='C') OR
-                    (UM.nombre LIKE '%" . $data['search'] . "%' AND UM.estatus_crud='C') OR
-                    (C.nombre  LIKE '%" . $data['search'] . "%' AND C.estatus_crud='C'))
+                    (P.id = '" . $data->search. "' OR
+                     P.nombre  LIKE '%" .$data->search . "%' OR
+                    (M.nombre  LIKE '%" . $data->search . "%' AND M.estatus_crud='C') OR
+                    (B.nombre  LIKE '%" . $data->search . "%' AND B.estatus_crud='C') OR
+                    (UM.nombre LIKE '%" . $data->search . "%' AND UM.estatus_crud='C') OR
+                    (C.nombre  LIKE '%" . $data->search . "%' AND C.estatus_crud='C'))
                     ORDER BY P.nombre");
                     }
                     break;
 
                 case 1:
                     {
-                        $validation = ValidatorController::validatorSimple($data,
-                            [
-                                'offset' => 'required',
-                                'limit' => 'required'
-                            ], 1);
+                        ValidatorController::validatorData($request->info, [
+                            'offset' => 'required|integer',
+                            'limit' => 'required|integer'
+                        ]);
 
-                        if ($validation['code'] != 200)
-                            return response()->json($validation, $validation['code']);
 
-                        $list = DB::connection('mysql2')->select("SELECT  P.id AS id
-                    FROM products AS P
-                    INNER JOIN brands AS B ON P.brand_id=B.id
-                    INNER JOIN materials AS M ON P.material_id=M.id
-                    INNER JOIN messuares AS UM ON P.messuare_id=UM.id
-                    INNER JOIN categories AS C ON P.category_id=C.id
-                    WHERE P.estatus_crud='C' AND
+                        $list = DB::connection('mysql2')
+                            ->select("SELECT  P.id AS id
+                                        FROM products AS P
+                                        INNER JOIN brands AS B ON P.brand_id=B.id
+                                        INNER JOIN materials AS M ON P.material_id=M.id
+                                        INNER JOIN messuares AS UM ON P.messuare_id=UM.id
+                                        INNER JOIN categories AS C ON P.category_id=C.id
+                                        WHERE P.estatus_crud='C' AND
                     P.is_web = 1 AND
-                    (P.id = '" . $data['search'] . "' OR
-                     P.nombre  LIKE '%" . $data['search'] . "%' OR
-                    (M.nombre  LIKE '%" . $data['search'] . "%' AND M.estatus_crud='C') OR
-                    (B.nombre  LIKE '%" . $data['search'] . "%' AND B.estatus_crud='C') OR
-                    (UM.nombre LIKE '%" . $data['search'] . "%' AND UM.estatus_crud='C') OR
-                    (C.nombre  LIKE '%" . $data['search'] . "%' AND C.estatus_crud='C'))
-                    ORDER BY P.nombre " . $data['orderby'] .
-                            " LIMIT " . $data['limit'] . " OFFSET " . $data['offset']);
+                    (P.id = '" . $data->search . "' OR
+                     P.nombre  LIKE '%" . $data->search . "%' OR
+                    (M.nombre  LIKE '%" . $data->search . "%' AND M.estatus_crud='C') OR
+                    (B.nombre  LIKE '%" . $data->search . "%' AND B.estatus_crud='C') OR
+                    (UM.nombre LIKE '%" . $data->search . "%' AND UM.estatus_crud='C') OR
+                    (C.nombre  LIKE '%" . $data->search . "%' AND C.estatus_crud='C'))
+                    ORDER BY P.nombre " . $data->orderby .
+                            " LIMIT " . $data->limit . " OFFSET " . $data->offset);
                     }
                     break;
 
                 case 2:
                     {
-                        $list = DB::connection('mysql2')->select(
-                            "SELECT  P.id AS id FROM products AS P
+                        $list = DB::connection('mysql2')
+                            ->select("SELECT  P.id AS id FROM products AS P
                     INNER JOIN categories AS C ON P.category_id=C.id
                     WHERE P.estatus_crud='C' AND
                     P.is_web = 1 AND
-                    C.nombre = '" . $data['search'] . "'");
+                    C.nombre = '" . $data->search . "'");
                     }
                     break;
 
                 case 3:
                     {
-                        $validation = ValidatorController::validatorSimple($data,
-                            [
-                                'offset' => 'required',
-                                'limit' => 'required'
-                            ], 1);
+                        ValidatorController::validatorData($request->info, [
+                            'offset' => 'required|integer',
+                            'limit' => 'required|integer'
+                        ]);
 
-                        if ($validation['code'] != 200)
-                            return response()->json($validation, $validation['code']);
-
-                        $list = DB::connection('mysql2')->select(
-                            "SELECT  P.id AS id FROM products AS P
+                        $list = DB::connection('mysql2')
+                            ->select("SELECT  P.id AS id FROM products AS P
                     INNER JOIN categories AS C ON P.category_id=C.id
                     WHERE P.estatus_crud='C' AND
                     P.is_web = 1 AND
-                    C.nombre = '" . $data['search'] . "'
-                    ORDER BY P.nombre " . $data['orderby'] .
-                            " LIMIT " . $data['limit'] . " OFFSET " . $data['offset']);
+                    C.nombre = '" . $data->search . "'
+                    ORDER BY P.nombre " . $data->orderby .
+                            " LIMIT " . $data->limit . " OFFSET " . $data->offset);
                     }
                     break;
 
                 case 4:
                     {
-                        $list = DB::connection('mysql2')->select(
-                            "SELECT  P.id AS id FROM products AS P
+                        $list = DB::connection('mysql2')
+                            ->select("SELECT  P.id AS id FROM products AS P
                     INNER JOIN brands AS B ON P.brand_id=B.id
                     WHERE P.estatus_crud='C' AND
                     P.is_web = 1 AND
-                    B.nombre = '" . $data['search'] . "'");
+                    B.nombre = '" . $data->search . "'");
                     }
                     break;
 
                 case 5:
                     {
-                        $validation = ValidatorController::validatorSimple($data,
-                            [
-                                'offset' => 'required',
-                                'limit' => 'required'
-                            ], 1);
+                        ValidatorController::validatorData($request->info, [
+                            'offset' => 'required|integer',
+                            'limit' => 'required|integer'
+                        ]);
 
-                        if ($validation['code'] != 200)
-                            return response()->json($validation, $validation['code']);
-
-                        $list = DB::connection('mysql2')->select("SELECT  P.id AS id
+                        $list = DB::connection('mysql2')
+                            ->select("SELECT  P.id AS id
                     FROM products AS P
                     INNER JOIN brands AS B ON P.brand_id=B.id
                     WHERE P.estatus_crud='C' AND
                     P.is_web = 1 AND
-                    B.nombre = '" . $data['search'] . "'
-                    ORDER BY P.nombre " . $data['orderby'] .
-                            " LIMIT " . $data['limit'] . " OFFSET " . $data['offset']);
+                    B.nombre = '" . $data->search . "'
+                    ORDER BY P.nombre " . $data->orderby .
+                            " LIMIT " . $data->limit . " OFFSET " . $data->offset);
                     }
                     break;
 
                 case 6:
                     {
-                        $list = DB::connection('mysql2')->select(
-                            "SELECT  P.id AS id FROM products AS P
+                        $list = DB::connection('mysql2')
+                            ->select("SELECT  P.id AS id FROM products AS P
                     INNER JOIN materials AS M ON P.material_id=M.id
                     WHERE P.estatus_crud='C' AND
                     P.is_web = 1 AND
-                    M.nombre = '" . $data['search'] . "'");
+                    M.nombre = '" . $data->search . "'");
                     }
                     break;
 
                 case 7:
                     {
-                        $validation = ValidatorController::validatorSimple($data,
-                            [
-                                'offset' => 'required',
-                                'limit' => 'required'
-                            ], 1);
+                        ValidatorController::validatorData($request->info, [
+                            'offset' => 'required|integer',
+                            'limit' => 'required|integer'
+                        ]);
 
-                        if ($validation['code'] != 200)
-                            return response()->json($validation, $validation['code']);
-
-                        $list = DB::connection('mysql2')->select(
-                            "SELECT  P.id AS id
+                        $list = DB::connection('mysql2')
+                            ->select("SELECT  P.id AS id
                     FROM products AS P
                     INNER JOIN materials AS M ON P.material_id=M.id
                     WHERE P.estatus_crud='C' AND
                     P.is_web = 1 AND
-                    M.nombre = '" . $data['search'] . "'
-                    ORDER BY P.nombre " . $data['orderby'] .
-                            " LIMIT " . $data['limit'] . " OFFSET " . $data['offset']);
+                    M.nombre = '" . $data->search . "'
+                    ORDER BY P.nombre " . $data->orderby .
+                            " LIMIT " . $data->limit . " OFFSET " . $data->offset);
                     }
                     break;
             }
             $listId = array();
+
             foreach ($list as $itrId)
-                array_push($listId, $itrId->id);
-            $list = ProductResource::collection(Product::with('brand', 'messuare', 'category', 'material')->
-            whereIn('id', $listId)->
-            orderBy('nombre', $data['orderby'])->get());
-            if ($data['filters'] == 1) {
+                $listId[] = $itrId->id;
+
+            $list = ProductResource::collection(Product::with('brand', 'messuare', 'category', 'material')
+                ->whereIn('id', $listId)
+                ->orderBy('nombre', $data->orderby)
+                ->get());
+            if ($data->filters == 1) {
                 $filters = [
                     'brands' => Brand::where('estatus_crud', 'C')->orderBy('nombre', 'ASC')->get(),
                     'materials' => Material::where('estatus_crud', 'C')->orderBy('nombre', 'ASC')->get(),
                     'categories' => Category::where('estatus_crud', 'C')->orderBy('nombre', 'ASC')->get()
                 ];
             }
-            if ($data['quantity'] == 1) {
-                switch ($data['opc']) {
+            if ($data->quantity == 1) {
+                switch ($data->opc) {
                     case 1:
                         {
-                            $quantity = count(DB::connection('mysql2')->select(
+                            $quantity = count(DB::connection('mysql2')
+                                ->select(
                                 "SELECT  P.id AS id FROM products AS P
                         INNER JOIN brands AS B ON P.brand_id=B.id
                         INNER JOIN materials AS M ON P.material_id=M.id
@@ -415,87 +404,92 @@ class ProductController extends Controller
                         INNER JOIN categories AS C ON P.category_id=C.id
                         WHERE P.estatus_crud='C' AND
                         P.is_web = 1 AND
-                        (P.id = '" . $data['search'] . "' OR
-                         P.nombre  LIKE '%" . $data['search'] . "%' OR
-                        (M.nombre  LIKE '" . $data['search'] . "%' AND M.estatus_crud='C') OR
-                        (B.nombre  LIKE '" . $data['search'] . "%' AND B.estatus_crud='C') OR
-                        (UM.nombre LIKE '" . $data['search'] . "%' AND UM.estatus_crud='C') OR
-                        (C.nombre  LIKE '" . $data['search'] . "%' AND C.estatus_crud='C'))"));
+                        (P.id = '" . $data->search . "' OR
+                         P.nombre  LIKE '%" . $data->search . "%' OR
+                        (M.nombre  LIKE '" . $data->search . "%' AND M.estatus_crud='C') OR
+                        (B.nombre  LIKE '" . $data->search . "%' AND B.estatus_crud='C') OR
+                        (UM.nombre LIKE '" . $data->search . "%' AND UM.estatus_crud='C') OR
+                        (C.nombre  LIKE '" . $data->search . "%' AND C.estatus_crud='C'))"));
                         }
                         break;
 
                     case 2:
                         {
-                            $quantity = count(DB::connection('mysql2')->select(
-                                "SELECT  P.id AS id FROM products AS P
-                        INNER JOIN categories AS C ON P.category_id=C.id
-                        WHERE P.estatus_crud='C' AND
-                        P.is_web = 1 AND
-                        C.nombre = '" . $data['search'] . "'"));
+                            $quantity = count(DB::connection('mysql2')
+                                ->select("SELECT  P.id AS id FROM products AS P
+                                        INNER JOIN categories AS C ON P.category_id=C.id
+                                        WHERE P.estatus_crud='C' AND
+                                        P.is_web = 1 AND
+                                        C.nombre = '" . $data->search . "'"));
                         }
                         break;
 
                     case 3:
                         {
-                            $quantity = count(DB::connection('mysql2')->select(
-                                "SELECT  P.id AS id FROM products AS P
+                            $quantity = count(DB::connection('mysql2')
+                                ->select("SELECT  P.id AS id FROM products AS P
                         INNER JOIN categories AS C ON P.category_id=C.id
                         WHERE P.estatus_crud='C' AND
                         P.is_web = 1 AND
-                        C.nombre = '" . $data['search'] . "'"));
+                        C.nombre = '" . $data->search . "'"));
                         }
                         break;
 
                     case 4:
                         {
-                            $quantity = count(DB::connection('mysql2')->select(
-                                "SELECT  P.id AS id FROM products AS P
-                        INNER JOIN brands AS B ON P.brand_id=B.id
-                        WHERE P.estatus_crud='C' AND
-                        P.is_web = 1 AND
-                        B.nombre = '" . $data['search'] . "'"));
+                            $quantity = count(DB::connection('mysql2')
+                                ->select("SELECT  P.id AS id FROM products AS P
+                                        INNER JOIN brands AS B ON P.brand_id=B.id
+                                        WHERE P.estatus_crud='C' AND
+                                        P.is_web = 1 AND
+                                        B.nombre = '" . $data->search . "'"));
                         }
                         break;
 
                     case 5:
                         {
-                            $quantity = count(DB::connection('mysql2')->select(
-                                "SELECT  P.id AS id FROM products AS P
+                            $quantity = count(DB::connection('mysql2')
+                                ->select("SELECT  P.id AS id FROM products AS P
                         INNER JOIN brands AS B ON P.brand_id=B.id
                         WHERE P.estatus_crud='C' AND
                         P.is_web = 1 AND
-                        B.nombre = '" . $data['search'] . "'"));
+                        B.nombre = '" . $data->search . "'"));
                         }
                         break;
 
                     case 6:
                         {
-                            $quantity = count(DB::connection('mysql2')->select(
-                                "SELECT  P.id AS id FROM products AS P
+                            $quantity = count(DB::connection('mysql2')
+                                ->select("SELECT  P.id AS id FROM products AS P
                         INNER JOIN materials AS M ON P.material_id=M.id
                         WHERE P.estatus_crud='C' AND
                         P.is_web = 1 AND
-                        M.nombre = '" . $data['search'] . "'"));
+                        M.nombre = '" . $data->search . "'"));
                         }
                         break;
 
                     case 7:
                         {
-                            $quantity = count(DB::connection('mysql2')->select(
-                                "SELECT  P.id AS id FROM products AS P
+                            $quantity = count(DB::connection('mysql2')
+                                ->select("SELECT  P.id AS id FROM products AS P
                         INNER JOIN materials AS M ON P.material_id=M.id
                         WHERE P.estatus_crud='C' AND
                         P.is_web = 1 AND
-                        M.nombre = '" . $data['search'] . "'"));
+                        M.nombre = '" . $data->search . "'"));
                         }
                         break;
                 }
             }
-            return response()->json(["data" => CryptoJSAES::encrypt(json_encode([
-                'list' => $list,
-                'filters' => $filters,
-                'quantity' => $quantity
-            ]), strval(env('APP_KEY')))], 200);
+//            return response()->json(["data" => CryptoJSAES::encrypt(json_encode([
+//                'list' => $list,
+//                'filters' => $filters,
+//                'quantity' => $quantity
+//            ]), strval(env('APP_KEY')))], 200);
+
+            return response()->json([
+                'message' => 'Successful query',
+                'data' => compact('list', 'filters', 'quantity')
+            ], ResponseHttp::HTTP_OK);
 
         } catch (CustomException $e) {
             return response([
