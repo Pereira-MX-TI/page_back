@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\Mail\InfoServiceMail;
 use App\Mail\QuotationMail;
 use Illuminate\Support\Facades\Mail;
-use Blocktrail\CryptoJSAES\CryptoJSAES;
 use App\Http\Controllers\ValidatorController;
 use Illuminate\Support\Facades\DB;
 use App\Models\v1\ContactWeb;
@@ -16,7 +15,6 @@ use App\Models\v1\QuotationWeb;
 use App\Models\v1\Contact;
 use App\Models\v1\RequestService;
 use App\Models\v1\DetailQuotationWeb;
-use App\Models\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Symfony\Component\HttpFoundation\Response as ResponseHttp;
 
@@ -214,6 +212,30 @@ class QuotatioWebController extends Controller
 
             return response()->json([
                 'message' => 'Successful Register Quotation Web',
+                'data' => $data
+            ], ResponseHttp::HTTP_OK);
+
+        } catch (CustomException $e) {
+            return response([
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        }
+    }
+
+    public function responseInvitation(Request $request)
+    {
+        try {
+            ValidatorController::validatorData($request->info, [
+                'id' => 'required',
+                'name' => 'required',
+                'status' => 'required',
+            ]);
+
+            $data = $request->info;
+
+
+            return response()->json([
+                'message' => 'Successful response',
                 'data' => $data
             ], ResponseHttp::HTTP_OK);
 

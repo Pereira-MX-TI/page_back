@@ -4,8 +4,8 @@ services:
     image: mysql:8.0.33
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: soluc108_page_schp
       MYSQL_PASSWORD: root
+      MYSQL_DATABASE: soluc108_page_schp
     volumes:
       - ./data:/var/lib/mysql
     ports:

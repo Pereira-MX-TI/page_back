@@ -19,7 +19,7 @@ class ProductResource extends JsonResource
             'messuare' => $this->messuare,
             'material' => $this->material,
             'description' => Description::where('id',$this->description_id)->first(),
-            'files' => FilePS::where([['register_id',$this->id],['register_type','P'],['estatus_crud','C']])->orderBy('id','ASC')->get()
+            'files' => FilePS::where([['register_id',$this->id],['register_type','P'],['estatus_crud','C'],['formato','IMG']])->orderBy('id','ASC')->get()
         ];
     }
 }

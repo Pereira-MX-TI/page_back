@@ -50,8 +50,8 @@ return [
             'port' => env('DB_PORT', '3306'),
 
             'database' => env('DB_DATABASE1', 'forge'),
-            'username' => env('DB_USERNAME1', 'forge'),
-            'password' => env('DB_PASSWORD1', ''),
+            'username' => env('DB_USERNAME', 'forge'),
+            'password' => env('DB_PASSWORD', ''),
 
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
@@ -72,8 +72,8 @@ return [
             'port' => env('DB_PORT', '3306'),
 
             'database' => env('DB_DATABASE2', 'forge'),
-            'username' => env('DB_USERNAME2', 'forge'),
-            'password' => env('DB_PASSWORD2', ''),
+            'username' => env('DB_USERNAME', 'forge'),
+            'password' => env('DB_PASSWORD', ''),
 
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',

@@ -9,6 +9,11 @@ class File extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'url',
+        'is_active', 
+    ];
+
     protected $hidden = [
         'created_at', 'updated_at','is_active'
     ];

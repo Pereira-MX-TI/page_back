@@ -6,7 +6,7 @@ return [
 
     'allowed_methods' => ['POST', 'GET', 'DELETE', 'PUT', 'OPTIONS', '*'],
 
-    'allowed_origins' => ['*', '*', '*','*, *', '*, *, *', '*'],
+    'allowed_origins' => ['http://localhost:2500', '*', '*','*, *', '*, *, *', '*'],
 
     'allowed_origins_patterns' => [],
 

@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ValidatorController;
 use App\Models\v1\CarouselH;
+use App\Models\v1\CarouselD;
+
 use App\Models\v1\Product;
 use App\Models\v1\File;
 use App\Http\Resources\v1\CarouselResource;
@@ -15,127 +17,112 @@ use Symfony\Component\HttpFoundation\Response as ResponseHttp;
 
 class CarouselController extends Controller
 {
-    static public function detailCarousel($data)
-    {
-        $list = array();
-        foreach($data as $itr)
-        {
-            $newDetail = null;
-            if($itr['type_register']=='P')
-            {
-                $newDetail =[
-                    'id' => $itr['id'],
-                    'product' => new ProductResource(Product::with('brand','messuare','category','material')->where('id',$itr['register_id'])->first())
-                ];
-            }
-            else
-            {
-                $newDetail =[
-                    'id' => $itr['id'],
-                    'direccion' =>(File::where('id',$itr['register_id'])->first())['address'],
-                    'link' => $itr['link']
-                ];
-            }
-
-            $list[] = $newDetail;
-        }
-
-        return $list;
-    }
-
-    public function getListCarousel(Request $request)
+    public function specificCarousel(Request $request)
     {
         try{
-            ValidatorController::validatorData($request->info, [
-                'listId' => 'required|array',
-                'listId.*' => 'integer' // Valída que todos los elementos del array sean enteros
-            ]);
 
-            $carousel = CarouselResource::collection(CarouselH::whereIn('id',$request->info->listId)->get());
+            ValidatorController::validatorData($request->info, [
+                'type' => 'string',]);
+            $INFO = $request->info;
+
+            $res = [
+                'info'=>null,
+                'list'=>[]
+            ];
+
+            switch($INFO->type){
+                case 'publicity':{
+                    $res['info'] =  CarouselH::where('id',1)->first();
+                    $list =  CarouselD::where('carousel_id',$res['info']['id'])->get();
+    
+                    foreach($list as $itr){
+                        $res['list'][] = [
+                            'id' => $itr['id'],
+                            'url' =>(File::where('id',$itr['register_id'])->first())['url'],
+                            'link' => $itr['link']
+                        ];
+                    }
+                }break;
+                case 'product':{
+                    $res['info'] =  CarouselH::where('id',2)->first();
+                    $list =  CarouselD::where('carousel_id',$res['info']['id'])->get();
+    
+                    foreach($list as $itr){
+                        $res['list'][] = [
+                            'id' => $itr['id'],
+                            'product' => new ProductResource(Product::with('brand','messuare','category','material')->where('id',$itr['register_id'])->first())
+                        ];
+                    }
+                }break;
+                case 'water_meter':{
+                    $res['info'] =  CarouselH::where('id',3)->first();
+                    $list =  CarouselD::where('carousel_id',$res['info']['id'])->get();
+    
+                    foreach($list as $itr){
+                        $res['list'][] = [
+                            'id' => $itr['id'],
+                            'product' => new ProductResource(Product::with('brand','messuare','category','material')->where('id',$itr['register_id'])->first())
+                        ];
+                    }
+                }break;
+                case 'valve':{
+                    $res['info'] =  CarouselH::where('id',4)->first();
+                    $list =  CarouselD::where('carousel_id',$res['info']['id'])->get();
+    
+                    foreach($list as $itr){
+                        $res['list'][] = [
+                            'id' => $itr['id'],
+                            'product' => new ProductResource(Product::with('brand','messuare','category','material')->where('id',$itr['register_id'])->first())
+                        ];
+                    }
+                }break;
+
+                case 'connection':{
+                    $res['info'] =  CarouselH::where('id',5)->first();
+                    $list =  CarouselD::where('carousel_id',$res['info']['id'])->get();
+    
+                    foreach($list as $itr){
+                        $res['list'][] = [
+                            'id' => $itr['id'],
+                            'product' => new ProductResource(Product::with('brand','messuare','category','material')->where('id',$itr['register_id'])->first())
+                        ];
+                    }
+                }break;
+
+                case 'itron-accell':{
+                    $res['info'] =  CarouselH::where('id',6)->first();
+                    $list =  CarouselD::where('carousel_id',$res['info']['id'])->get();
+    
+                    foreach($list as $itr){
+                        $res['list'][] = [
+                            'id' => $itr['id'],
+                            'product' => new ProductResource(Product::with('brand','messuare','category','material')->where('id',$itr['register_id'])->first())
+                        ];
+                    }
+                }break;
+
+                case 'alfa':{
+                    $res['info'] =  CarouselH::where('id',7)->first();
+                    $list =  CarouselD::where('carousel_id',$res['info']['id'])->get();
+    
+                    foreach($list as $itr){
+                        $res['list'][] = [
+                            'id' => $itr['id'],
+                            'product' => new ProductResource(Product::with('brand','messuare','category','material')->where('id',$itr['register_id'])->first())
+                        ];
+                    }
+                }break;
+
+            }
 
             return response([
                 'message' => 'Successful query',
-                'data' => $carousel,
+                'data' =>$res,
             ], ResponseHttp::HTTP_OK);
 
         } catch (CustomException $e) {
             return response([
                 'message' => $e->getMessage(),
-            ], $e->getCode());
-        }
-    }
-
-    public function getCarousel(Request $request)
-    {
-        try {
-            ValidatorController::validatorData($request->info, [
-                'id' => 'required|integer'
-            ]);
-
-            $carousel = CarouselH::where('id', $request->info->id)->first();
-
-            if (!$carousel){
-                throw new CustomException('There are no search results', ResponseHttp::HTTP_BAD_REQUEST);
-            }
-
-            return response([
-                'message' => 'Successful query',
-                'data' => new CarouselResource($carousel),
-            ], ResponseHttp::HTTP_OK);
-
-        } catch (CustomException $e) {
-            return response([
-                'message' => $e->getMessage()
-            ], $e->getCode());
-        }
-    }
-
-    public function getPublicity(Request $request)
-    {
-        try{
-
-            ValidatorController::validatorData($request->info, [
-                'listProduct' => 'array',
-                'listProduct.*' => 'integer' // Valída que todos los elementos del array sean enteros
-            ]);
-            $data = $request->info;
-
-            if(!isset($data->listProduct))
-            {
-                return response()->json([
-                    'message' => 'Successful query',
-                    "data" => ['carrousel1'=>[],'carrousel2'=>[]],
-                    ], ResponseHttp::HTTP_OK);
-            }
-
-            if(count($data->listProduct) != 0)
-            {
-                $publicity['carrousel1'] = ProductResource::collection(
-                    Product::with('brand','messuare','category','material')
-                        ->whereNotIn("id",$data->listProduct)
-                        ->where([['estatus_crud','C'],['is_web',1]])
-                        ->limit(12)
-                        ->orderBy('nombre',rand(0,1)==1?'ASC':'DESC')
-                        ->get()
-                );
-            } else {
-                $publicity['carrousel1'] = ProductResource::collection(
-                    Product::with('brand','messuare','category','material')
-                        ->where([['estatus_crud','C'],['is_web',1],['category_id',8]])
-                        ->limit(12)
-                        ->orderBy('nombre',rand(0,1)==1?'ASC':'DESC')
-                        ->get()
-                );
-            }
-
-            return response([
-                'message' => 'Successful query',
-                'data' => $publicity,
-            ], ResponseHttp::HTTP_OK);
-
-        } catch (CustomException $e) {
-            return response([
-                'message' => $e->getMessage()
             ], $e->getCode());
         }
     }
