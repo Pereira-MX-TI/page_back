@@ -19,4 +19,10 @@ Route::prefix('v1/product')->middleware([])->group(static function () {
 
     Route::get('listProduct',[Product::class,'listProduct'])
     ->middleware(['encryptResponse','decryptData']);
+
+    Route::get('detailProduct',[Product::class,'detailProduct'])
+    ->middleware(['encryptResponse','decryptData']);
+
+    Route::get('productsByCategory',[Product::class,'productsByCategory'])
+    ->middleware(['encryptResponse','decryptData']);
 });
