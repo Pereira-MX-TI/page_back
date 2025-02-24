@@ -3,15 +3,17 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class QuotationMail extends Mailable
 {
     use Queueable, SerializesModels;
+
     public $request;
+
     public $subjet;
+
     /**
      * Create a new message instance.
      *
@@ -20,7 +22,7 @@ class QuotationMail extends Mailable
     public function __construct($request_)
     {
         $this->request = $request_;
-        $this->subjet = "Solicitud de cotizacion";
+        $this->subjet = 'Solicitud de cotizacion';
     }
 
     /**

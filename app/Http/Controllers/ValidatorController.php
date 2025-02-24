@@ -3,139 +3,136 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\CustomException;
-use Blocktrail\CryptoJSAES\CryptoJSAES;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
-
 use App\Models\Response;
 use App\Models\Token;
-
+use Blocktrail\CryptoJSAES\CryptoJSAES;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ValidatorController extends Controller
 {
-    static public function validatorGral($data,$paramaters,$opc)
+    public static function validatorGral($data, $paramaters, $opc)
     {
-        $validator = Validator::make($data->all(),['data' => 'required']);
-        if ($validator->fails())
+        $validator = Validator::make($data->all(), ['data' => 'required']);
+        if ($validator->fails()) {
             return Response::where('code', '422')->get()->first();
+        }
 
-        if($opc==0)
+        if ($opc == 0) {
             $data = CryptoJSAES::decrypt($data['data'], env('APP_KEY'));
-        else
-        {
+        } else {
             $data = $data->all();
-            //$data = str_replace(' ','+',$data['data']);
-            $data = preg_replace('/[~]/','/',$data['data']);
+            // $data = str_replace(' ','+',$data['data']);
+            $data = preg_replace('/[~]/', '/', $data['data']);
             $data = base64_decode($data);
 
             $data = CryptoJSAES::decrypt($data, env('APP_KEY'));
         }
 
         try {
-            $data = json_decode($data,true);
+            $data = json_decode($data, true);
             $validator = Validator::make($data, $paramaters);
 
-            if ($validator->fails())
+            if ($validator->fails()) {
                 return Response::where('code', '422')->get()->first();
+            }
 
-            return ['code'=>200,'data'=>$data];
-        }
-        catch (\Exception $e)
-        {
+            return ['code' => 200, 'data' => $data];
+        } catch (\Exception $e) {
             Log::debug($e->getMessage());
+
             return Response::where('code', '601')->get()->first();
         }
     }
 
-    static public function validatorSimple($data,$paramaters)
+    public static function validatorSimple($data, $paramaters)
     {
         $validator = Validator::make($data, $paramaters);
 
-        if ($validator->fails())
+        if ($validator->fails()) {
             return Response::where('code', '422')->get()->first();
+        }
 
-        return ['code'=>200,'data'=>$data];
+        return ['code' => 200, 'data' => $data];
     }
 
-    static public function validatorToken($data)
+    public static function validatorToken($data)
     {
-        if(!isset($data['datatoken']))
-            return ['code'=>401,'name'=>'Error','Token'=>'Token invalid'];
+        if (! isset($data['datatoken'])) {
+            return ['code' => 401, 'name' => 'Error', 'Token' => 'Token invalid'];
+        }
 
-        if(count($data['datatoken'])==0)
-            return ['code'=>401,'name'=>'Error','Token'=>'Token invalid'];
+        if (count($data['datatoken']) == 0) {
+            return ['code' => 401, 'name' => 'Error', 'Token' => 'Token invalid'];
+        }
 
-        if(Token::where([['data',$data['datatoken'][0]],['is_active',1]])->get()->count()==0)
-            return ['code'=>401,'name'=>'Error','Token'=>'Token invalid'];
+        if (Token::where([['data', $data['datatoken'][0]], ['is_active', 1]])->get()->count() == 0) {
+            return ['code' => 401, 'name' => 'Error', 'Token' => 'Token invalid'];
+        }
 
-        return ['code'=>200,'name'=>'fine','description'=>'Fine validation'];
+        return ['code' => 200, 'name' => 'fine', 'description' => 'Fine validation'];
     }
 
-    static public function replaceData($data)
+    public static function replaceData($data)
     {
-        $data = str_replace(' ','+',$data['data']);
-        $data = preg_replace('/[~]/','/',$data);
+        $data = str_replace(' ', '+', $data['data']);
+        $data = preg_replace('/[~]/', '/', $data);
+
         return $data;
     }
 
-    static public function validatorQuotationWeb($contact,$address_ip)
+    public static function validatorQuotationWeb($contact, $address_ip)
     {
         $currentTime = date('Y-m-d H:i:s');
         $quantity = 0;
-        if(isset($address_ip))
-        {
+        if (isset($address_ip)) {
             $quantity = count(DB::connection('mysql2')
                 ->select(
                     "SELECT QW.id FROM quotation_web QW
                             INNER JOIN contact_web CW ON QW.client_web_id=CW.id
-                            WHERE QW.created_at LIKE '%".date_format(date_create($currentTime),"Y-m-d")."%' AND
+                            WHERE QW.created_at LIKE '%".date_format(date_create($currentTime), 'Y-m-d')."%' AND
                             (CW.email = '".$contact['email']."' OR
                             QW.ip_address = '".$address_ip['ip']."')"
-                        )
-                );
-        }
-        else
-        {
+                )
+            );
+        } else {
             $quantity = count(DB::connection('mysql2')->select("SELECT QW.id FROM quotation_web QW
             INNER JOIN contact_web CW ON QW.client_web_id=CW.id
-            WHERE QW.created_at LIKE '%".date_format(date_create($currentTime),"Y-m-d")."%' AND
+            WHERE QW.created_at LIKE '%".date_format(date_create($currentTime), 'Y-m-d')."%' AND
             CW.email = '".$contact['email']."'"));
         }
 
-        return $quantity < 5?true:false;
+        return $quantity < 5 ? true : false;
     }
 
-    static public function validatorRequestInfoService($contact,$address_ip)
+    public static function validatorRequestInfoService($contact, $address_ip)
     {
         $currentTime = date('Y-m-d H:i:s');
         $quantity = 0;
-        if(isset($address_ip))
-        {
+        if (isset($address_ip)) {
             $quantity = count(DB::connection('mysql')->select("SELECT RS.id FROM request_services RS
             INNER JOIN contacts CW ON RS.contact_id=CW.id
-            WHERE RS.created_at LIKE '%".date_format(date_create($currentTime),"Y-m-d")."%' AND
+            WHERE RS.created_at LIKE '%".date_format(date_create($currentTime), 'Y-m-d')."%' AND
             (CW.email = '".$contact['email']."' OR
             RS.ip_address = '".$address_ip['ip']."')"));
-        }
-        else
-        {
+        } else {
             $quantity = count(DB::connection('mysql')->select("SELECT RS.id FROM request_services RS
             INNER JOIN contacts CW ON RS.contact_id=CW.id
-            WHERE RS.created_at LIKE '%".date_format(date_create($currentTime),"Y-m-d")."%' AND
+            WHERE RS.created_at LIKE '%".date_format(date_create($currentTime), 'Y-m-d')."%' AND
             CW.email = '".$contact['email']."'"));
         }
 
-        return $quantity < 5?true:false;
+        return $quantity < 5 ? true : false;
     }
 
-
-    //TODO: Controlador Daniel
+    // TODO: Controlador Daniel
     /**
      * @Description Validar los datos de entrada, en request
+     *
      * @throws CustomException
      */
-    static public function validatorData($data, $params)
+    public static function validatorData($data, $params)
     {
         $validator = Validator::make(get_object_vars($data), $params);
         if ($validator->fails()) {

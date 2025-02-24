@@ -4,18 +4,18 @@ namespace App\Http\Controllers\v1;
 
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ValidatorController;
 use App\Mail\InfoServiceMail;
 use App\Mail\QuotationMail;
-use Illuminate\Support\Facades\Mail;
-use App\Http\Controllers\ValidatorController;
-use Illuminate\Support\Facades\DB;
-use App\Models\v1\ContactWeb;
-use App\Models\v1\QuotationWeb;
 use App\Models\v1\Contact;
-use App\Models\v1\RequestService;
+use App\Models\v1\ContactWeb;
 use App\Models\v1\DetailQuotationWeb;
+use App\Models\v1\QuotationWeb;
+use App\Models\v1\RequestService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpFoundation\Response as ResponseHttp;
 
 class QuotatioWebController extends Controller
@@ -31,32 +31,31 @@ class QuotatioWebController extends Controller
                 'contact.cp' => 'required',
                 'ip_address' => 'required',
                 'ip_address.ip' => 'required',
-                'listProduct' => 'required'
+                'listProduct' => 'required',
             ]);
-
 
             $data = $request->info;
             $validation = ValidatorController::validatorQuotationWeb($data->contact, $data->ip_address);
 
-            if (!$validation){
+            if (! $validation) {
                 throw new CustomException('Problem with consulta', 210);
             }
 
             $currentTime = date('Y-m-d H:i:s');
-            $listData = array();
+            $listData = [];
 
-            $contact_web = ContactWeb::where("email", $data->contact['email'])
-                ->orderBy("id", "DESC")
+            $contact_web = ContactWeb::where('email', $data->contact['email'])
+                ->orderBy('id', 'DESC')
                 ->first();
 
             if (isset($contact_web)) {
 
                 ContactWeb::where('id', $contact_web->id)
                     ->update([
-                    'name' => $data->contact['name'],
-                    'phone' => $data->contact['phone'],
-                    'cp' => $data->contact['cp']
-                ]);
+                        'name' => $data->contact['name'],
+                        'phone' => $data->contact['phone'],
+                        'cp' => $data->contact['cp'],
+                    ]);
 
             } else {
 
@@ -65,11 +64,11 @@ class QuotatioWebController extends Controller
                     'email' => $data->contact['email'],
                     'phone' => $data->contact['phone'],
                     'cp' => $data->contact['cp'],
-                    'is_active' => 1
+                    'is_active' => 1,
                 ]);
 
-                $contact_web = ContactWeb::where("email", $data->contact['email'])
-                    ->orderBy("id", "DESC")
+                $contact_web = ContactWeb::where('email', $data->contact['email'])
+                    ->orderBy('id', 'DESC')
                     ->first();
             }
 
@@ -78,25 +77,25 @@ class QuotatioWebController extends Controller
                 'user_id' => 7,
                 'ip_address' => isset($data->ip_address) ? $data->ip_address['ip'] : '',
                 'is_active' => 1,
-                'status' => 'P'
+                'status' => 'P',
             ]);
 
             $quotation_web = QuotationWeb::where([
-                ["client_web_id", $contact_web['id']],
-                ["ip_address", $data->ip_address['ip']],
-                ])
-                ->orderBy("id", "DESC")
+                ['client_web_id', $contact_web['id']],
+                ['ip_address', $data->ip_address['ip']],
+            ])
+                ->orderBy('id', 'DESC')
                 ->first();
 
             foreach ($data->listProduct as $itrData) {
 
                 $cost = DB::connection('mysql2')
-                    ->select("SELECT (CASE
+                    ->select('SELECT (CASE
                 WHEN C.calculate_id=1 THEN ROUND(C.costo*((C.utilidad/100.000)+1.000),3)
                 ELSE ROUND((C.costo*CC.valor)*((C.utilidad/100.000)+1.000),3)
                 END) cost FROM costs C
                 INNER JOIN cost_calculates CC ON C.calculate_id=CC.id
-                WHERE C.concept_id = " . $itrData['product']['id'] . " AND
+                WHERE C.concept_id = '.$itrData['product']['id']." AND
                 C.tipo_concepto = 'P' ORDER BY C.id DESC LIMIT 1");
 
                 $listData[] = [
@@ -114,29 +113,29 @@ class QuotatioWebController extends Controller
                     'tipo_concepto' => 'P',
                     'cantidad' => $itrData['quantity'],
                     'precio_unitario' => count($cost) == 0 ? 0 : $cost[0]->cost,
-                    'estatus_crud' => 'C'
+                    'estatus_crud' => 'C',
                 ]);
             }
 
-            $pdf = PDF::loadView("pdf.requestQuotation", compact(['quotation_web', 'contact_web', 'listData', 'currentTime']));
+            $pdf = PDF::loadView('pdf.requestQuotation', compact(['quotation_web', 'contact_web', 'listData', 'currentTime']));
 
-            $objFile['name'] = 'Folio_Solicitud_' . time();
+            $objFile['name'] = 'Folio_Solicitud_'.time();
             $objFile['data'] = base64_encode($pdf->download('requestQuotation.pdf'));
 
-            Mail::to("solucionescomerciales_jmpf@outlook.com")
+            Mail::to('solucionescomerciales_jmpf@outlook.com')
                 ->send(new QuotationMail([
-                'contact' => $contact_web,
-                'quotation' => $quotation_web,
-            ]));
+                    'contact' => $contact_web,
+                    'quotation' => $quotation_web,
+                ]));
 
             return response()->json([
                 'message' => 'Successful Register Quotation Web',
-                'data' => $objFile
+                'data' => $objFile,
             ], ResponseHttp::HTTP_OK);
 
         } catch (CustomException $e) {
             return response([
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], $e->getCode());
         }
     }
@@ -160,24 +159,22 @@ class QuotatioWebController extends Controller
 
             $validation = ValidatorController::validatorRequestInfoService($data->contact, $data->ip_address);
 
-
-            if (!$validation){
+            if (! $validation) {
                 throw new CustomException('Problem with consulta', 210);
             }
 
-            $contact_web = Contact::where("email", $data->contact['email'])
-                ->orderBy("id", "DESC")
+            $contact_web = Contact::where('email', $data->contact['email'])
+                ->orderBy('id', 'DESC')
                 ->first();
-
 
             if (isset($contact_web)) {
 
                 Contact::where('id', $contact_web['id'])
                     ->update([
-                    'name' => $data->contact['name'],
-                    'phone' => $data->contact['phone'],
-                    'cp' => $data->contact['cp']
-                ]);
+                        'name' => $data->contact['name'],
+                        'phone' => $data->contact['phone'],
+                        'cp' => $data->contact['cp'],
+                    ]);
             } else {
 
                 Contact::create([
@@ -185,11 +182,11 @@ class QuotatioWebController extends Controller
                     'email' => $data->contact['email'],
                     'phone' => $data->contact['phone'],
                     'cp' => $data->contact['cp'],
-                    'is_active' => 1
+                    'is_active' => 1,
                 ]);
 
-                $contact_web = Contact::where("email", $data->contact['email'])
-                    ->orderBy("id", "DESC")
+                $contact_web = Contact::where('email', $data->contact['email'])
+                    ->orderBy('id', 'DESC')
                     ->first();
             }
 
@@ -199,25 +196,24 @@ class QuotatioWebController extends Controller
                 'name' => $data->service,
                 'message' => $data->contact['description'],
                 'is_active' => 1,
-                'status' => 'P' //TODO: Que colocar en esta columna
+                'status' => 'P', // TODO: Que colocar en esta columna
             ]);
 
-
-            Mail::to("solucionescomerciales_jmpf@outlook.com")
+            Mail::to('solucionescomerciales_jmpf@outlook.com')
                 ->send(new InfoServiceMail([
-                'contact' => $contact_web,
-                'service' => $data->service,
-                'message' => $data->contact['description']
-            ]));
+                    'contact' => $contact_web,
+                    'service' => $data->service,
+                    'message' => $data->contact['description'],
+                ]));
 
             return response()->json([
                 'message' => 'Successful Register Quotation Web',
-                'data' => $data
+                'data' => $data,
             ], ResponseHttp::HTTP_OK);
 
         } catch (CustomException $e) {
             return response([
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], $e->getCode());
         }
     }
@@ -233,15 +229,14 @@ class QuotatioWebController extends Controller
 
             $data = $request->info;
 
-
             return response()->json([
                 'message' => 'Successful response',
-                'data' => $data
+                'data' => $data,
             ], ResponseHttp::HTTP_OK);
 
         } catch (CustomException $e) {
             return response([
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], $e->getCode());
         }
     }

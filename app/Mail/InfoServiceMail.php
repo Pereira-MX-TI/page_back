@@ -3,14 +3,15 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class InfoServiceMail extends Mailable
 {
     use Queueable, SerializesModels;
+
     public $request;
+
     public $subjet;
 
     /**
@@ -21,7 +22,7 @@ class InfoServiceMail extends Mailable
     public function __construct($request_)
     {
         $this->request = $request_;
-        $this->subjet = "Solicitud de información en servicio";
+        $this->subjet = 'Solicitud de información en servicio';
     }
 
     /**

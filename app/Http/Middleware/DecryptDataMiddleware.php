@@ -3,17 +3,16 @@
 namespace App\Http\Middleware;
 
 use App\Exceptions\CustomException;
-use Closure;
-use stdClass;
 use Blocktrail\CryptoJSAES\CryptoJSAES;
+use Closure;
 use Illuminate\Http\Request;
+use stdClass;
 
 class DecryptDataMiddleware
 {
     /**
      * @Description Decrypt data from request
-     * @param Request $request
-     * @param Closure $next
+     *
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
@@ -26,7 +25,7 @@ class DecryptDataMiddleware
             }
 
             if (env('APP_ENV') == 'dev') {
-                $data = new stdClass();
+                $data = new stdClass;
                 if (is_string($info)) {
                     $data = json_decode($info);
                 } else {
@@ -34,6 +33,7 @@ class DecryptDataMiddleware
                         $data->$clave = $valor;
                     }
                 }
+
                 return $next($request->merge(['info' => $data]));
             }
 
@@ -47,11 +47,11 @@ class DecryptDataMiddleware
             if (is_string($data)) {
                 $data = json_decode($data);
             }
+
             return $next($request->merge(['info' => $data]));
 
         } catch (CustomException $e) {
             return response()->json(['message' => $e->getMessage()], $e->getCode());
         }
     }
-
 }

@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Http\Resources\v1;
-use App\Models\v1\CarouselD;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-use App\Models\v1\Product;
+use App\Models\v1\CarouselD;
 use App\Models\v1\File;
+use App\Models\v1\Product;
+use Illuminate\Http\Resources\Json\JsonResource;
+
 class CarouselResource extends JsonResource
 {
     /**
@@ -26,23 +27,19 @@ class CarouselResource extends JsonResource
 
     public function detailCarousel($data)
     {
-        $list = array();
-        foreach($data as $itr)
-        {
+        $list = [];
+        foreach ($data as $itr) {
             $newDetail = null;
-            if($itr['type_register']=='product')
-            {
-                $newDetail =[
+            if ($itr['type_register'] == 'product') {
+                $newDetail = [
                     'id' => $itr['id'],
                     // 'product' => new ProductResource(Product::with('brand','messuare','category','material')->where('id',$itr['register_id'])->first())
                 ];
-            }
-            else
-            {
-                $newDetail =[
+            } else {
+                $newDetail = [
                     'id' => $itr['id'],
                     // 'url' =>(File::where('id',$itr['register_id'])->first())['url'],
-                    'link' => $itr['link']
+                    'link' => $itr['link'],
                 ];
             }
 

@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use App\Exceptions\CustomException;
 use Blocktrail\CryptoJSAES\CryptoJSAES;
-use Illuminate\Http\Request;
 use Closure;
+use Illuminate\Http\Request;
 use stdClass;
 
 class DecryptHeadersMiddleware
@@ -20,7 +20,7 @@ class DecryptHeadersMiddleware
             }
 
             if (env('APP_ENV') == 'dev') {
-                $data = new stdClass();
+                $data = new stdClass;
                 if (is_string($headers)) {
                     $data = json_decode($headers);
                 } else {
@@ -28,6 +28,7 @@ class DecryptHeadersMiddleware
                         $data->$clave = $valor;
                     }
                 }
+
                 return $next($request->merge(['api' => $data]));
             }
 

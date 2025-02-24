@@ -1,6 +1,7 @@
 <?php
+
 return [
-    'environment' =>[
+    'environment' => [
         'APP_NAME',
         'APP_ENV',
         'APP_KEY',
@@ -48,5 +49,5 @@ return [
         'MIX_PUSHER_APP_KEY',
         'MIX_PUSHER_APP_CLUSTER',
         'JWT_SECRET',
-    ]
+    ],
 ];

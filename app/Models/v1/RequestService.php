@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class RequestService extends Model
 {
     use HasFactory;
-    protected $table = "request_services";
+
+    protected $table = 'request_services';
 
     protected $fillable = [
         'contact_id',
@@ -16,12 +17,12 @@ class RequestService extends Model
         'name',
         'message',
         'is_active',
-        'status'
+        'status',
     ];
 
     protected $hidden = [
         'is_active',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 }

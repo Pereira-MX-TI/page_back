@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Config;
 class EnvCheck extends Command
 {
     protected $signature = 'env:check';
+
     protected $description = 'Check environment variables';
 
     public function __construct()

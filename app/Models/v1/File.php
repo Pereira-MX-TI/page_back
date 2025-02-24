@@ -11,10 +11,10 @@ class File extends Model
 
     protected $fillable = [
         'url',
-        'is_active', 
+        'is_active',
     ];
 
     protected $hidden = [
-        'created_at', 'updated_at','is_active'
+        'created_at', 'updated_at', 'is_active',
     ];
 }

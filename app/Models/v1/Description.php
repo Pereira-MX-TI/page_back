@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Description extends Model
 {
     use HasFactory;
+
     protected $connection = 'mysql2';
 
     protected $hidden = [
-        'service_id','product_id','estatus_crud', 'user_id'
+        'service_id', 'product_id', 'estatus_crud', 'user_id',
     ];
 }

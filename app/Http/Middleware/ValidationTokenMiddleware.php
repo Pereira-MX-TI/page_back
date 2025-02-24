@@ -2,11 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use App\Exceptions\CustomException;
 use App\Http\Models\v1\Token;
+use Closure;
 use Illuminate\Http\Request;
-
 
 class ValidationTokenMiddleware
 {
@@ -25,7 +24,7 @@ class ValidationTokenMiddleware
         } catch (CustomException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
-                'code' => $e->getCode()
+                'code' => $e->getCode(),
             ], $e->getCode());
         }
     }
