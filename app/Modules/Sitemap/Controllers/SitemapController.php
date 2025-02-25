@@ -14,7 +14,7 @@ class SitemapController extends Controller
 
     public function createSitemap()
     {
-        $pathOfProductFrontend = 'Productos/Vista?data=';
+        $pathOfProductFrontend = 'https://medidordeagua.mx/Productos/Vista?data=';
         $sitemap = Sitemap::create();
 
         foreach ($this->productService->getAllProduct() as $product) {
