@@ -146,19 +146,17 @@ class ProductController extends Controller
             ORDER BY P.nombre ".$INFO->orderby;
 
             $list = [];
-            $listDirty = DB::connection('mysql2')->select($query.' 
-            LIMIT '.(int) $INFO->limit.' 
+            $listDirty = DB::connection('mysql2')->select($query.'
+            LIMIT '.(int) $INFO->limit.'
             OFFSET '.(int) $INFO->offset);
 
             foreach ($listDirty as $itr) {
-                $list[] = new ProductResource(
-                    Product::with('brand', 'messuare', 'category', 'material')
-                        ->where('id', $itr->id)
-                        ->orderBy('nombre', $INFO->orderby)
-                        ->offset($INFO->offset)
-                        ->limit($INFO->limit)
-                        ->first()
-                );
+                $product =
+                    Product::with('brand', 'messuare', 'category', 'material')->
+                        where('id', $itr->id)->
+                        first();
+
+                if($product)$list[] = new ProductResource($product);
             }
 
             if ($INFO->totalRecords == 1) {
@@ -183,48 +181,65 @@ class ProductController extends Controller
         }
     }
 
-    public function getProduct(Request $request)
+    public function detailProduct(Request $request)
     {
         try {
+
             ValidatorController::validatorData($request->info, [
-                'id' => 'required|integer',
-                'publicity' => 'required|integer',
+                'id' => 'required',
             ]);
 
-            $data = $request->info;
-            $publicity = ['listProduct1' => [], 'listProduct2' => []];
+            $INFO = $request->info;
 
             $product = new ProductResource(
                 Product::with('brand', 'messuare', 'category', 'material')
-                    ->where('id', $data->id)
+                    ->where('id', $INFO->id)
                     ->first()
             );
 
-            if ($data->publicity == 1) {
-
-                $publicity['listProduct1'] = ProductResource::collection(
-                    Product::with('brand', 'messuare', 'category', 'material')
-                        ->where([['category_id', $product['category']['id']], ['id', '!=', $product['id']], ['estatus_crud', 'C'], ['is_web', 1]])
-                        ->orderBy('id', rand(0, 1) == 1 ? 'ASC' : 'DESC')
-                        ->offset(rand(1, 3)) // TODO: duda que quieres hacer
-                        ->limit(3) // TODO: duda que quieres hacer
-                        ->get()
-                );
-
-                $publicity['listProduct2'] = ProductResource::collection(
-                    Product::with('brand', 'messuare', 'category', 'material')
-                        ->where([['brand_id', $product['brand']['id']], ['id', '!=', $product['id']], ['estatus_crud', 'C'], ['is_web', 1]])
-                        ->orderBy('id', rand(0, 1) == 1 ? 'ASC' : 'DESC')
-                        ->offset(rand(1, 3)) // TODO: duda que quieres hacer
-                        ->limit(15) // TODO: duda que quieres hacer
-                        ->get()
-                );
-            }
-
-            return response()->json([
+            return response([
                 'message' => 'Successful query',
-                'product' => $product,
-                'publicity' => $publicity,
+                'data' => [
+                    'product' => $product,
+                ],
+            ], ResponseHttp::HTTP_OK);
+
+        } catch (CustomException $e) {
+            return response([
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        }
+    }
+
+    public function productsByCategory(Request $request)
+    {
+        try {
+
+            ValidatorController::validatorData($request->info, [
+                'product_id' => 'required',
+            ]);
+
+            $INFO = $request->info;
+
+            $product = Product::where('id', $INFO->product_id)->first();
+
+            $list = ProductResource::collection(
+                Product::with('brand', 'messuare', 'category', 'material')
+                    ->where([
+                        ['category_id', $product['category_id']],
+                        ['id', '!=',$product['id']],
+                        ['estatus_crud', 'C'],
+                        ['is_web', 1]
+                    ])
+                    ->inRandomOrder()
+                    ->limit(10)
+                    ->get()
+            );
+
+
+            return response([
+                'message' => 'Successful query',
+                'data' => $list,
             ], ResponseHttp::HTTP_OK);
 
         } catch (CustomException $e) {
