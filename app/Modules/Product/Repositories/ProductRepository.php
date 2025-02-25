@@ -11,6 +11,7 @@ class ProductRepository
 
     public function getAllProduct(): Collection|array
     {
-        return $this->productModel::where('is_active', 1)->get();
+        return $this->productModel->all();
+        //        return $this->productModel::where('is_active', 1)->get();
     }
 }
