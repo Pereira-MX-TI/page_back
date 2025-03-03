@@ -12,6 +12,6 @@ class ProductRepository
     public function getAllProduct(): Collection|array
     {
         //        return $this->productModel->all();
-        return $this->productModel::where('estatus_crud', 'C')->get();
+        return $this->productModel::where([['estatus_crud', 'C'],['is_web',1]])->get();
     }
 }
