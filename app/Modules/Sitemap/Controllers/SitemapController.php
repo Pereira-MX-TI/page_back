@@ -19,7 +19,7 @@ class SitemapController extends Controller
 
         foreach ($this->productService->getAllProduct() as $product) {
 
-            $encodedId = $this->base64UrlEncode($product->id);
+            $encodedId = $this->convertSearch($product->nombre).'~'.$this->base64UrlEncode($product->id);
 
             $sitemap->add(Url::create($pathOfProductFrontend . $encodedId)
                 ->setLastModificationDate($product->updated_at ?? Carbon::now())
@@ -33,20 +33,17 @@ class SitemapController extends Controller
 
     }
 
-    /**
-     * Codifica un ID en Base64 URL-safe.
-     */
     private function base64UrlEncode($input)
     {
         return rtrim(strtr(base64_encode($input), '+/', '-_'), '=');
     }
 
-    /**
-     * Decodifica un ID en Base64 URL-safe.
-     */
-    private function base64UrlDecode($input)
+    function convertSearch(string $res): string
     {
-        $base64 = strtr($input, '-_', '+/');
-        return base64_decode(str_pad($base64, strlen($base64) % 4, '=', STR_PAD_RIGHT));
+        return str_replace(
+            ['(', ')'],
+            ['%28', '%29'],
+            rawurlencode(trim($res))
+        );
     }
 }
