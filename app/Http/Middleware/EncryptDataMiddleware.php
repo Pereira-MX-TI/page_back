@@ -23,13 +23,13 @@ class EncryptDataMiddleware
         }
 
         $content = $response->getContent();
-        if (env('APP_ENV') == 'dev') {
+        if (config('app.env') == 'dev') {
             $response->setContent(['data' => json_decode($content, true)]);
 
             return $response;
         }
 
-        $encryptedContent = CryptoJSAES::encrypt($content, strval(env('APP_KEY')));
+        $encryptedContent = CryptoJSAES::encrypt($content, strval(config('app.crypto_key')));
         $response->setContent(['data' => $encryptedContent]);
 
         return $response;

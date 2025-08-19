@@ -29,7 +29,7 @@ return [
     | mailers below. You are free to add additional mailers as required.
     |
     | Supported: "smtp", "sendmail", "mailgun", "ses",
-    |            "postmark", "log", "array", "failover"
+    |            "postmark", "log", "array"
     |
     */
 
@@ -41,6 +41,27 @@ return [
             'encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
+            'timeout' => null,
+            'auth_mode' => null,
+        ],
+
+        /*
+         ! Se ocupa esta configuración por que el hosting no deja enviar emails
+         ! Si se cambia de provedor y funciona pueden olvidar esta configuración
+        */
+        'alternative_smtp' => [
+            'transport' => 'smtp',
+            'host' => env('MAIL_HOST_ALTERNATIVE', 'smtp.mailgun.org'),
+            'port' => env('MAIL_PORT_ALTERNATIVE', 587),
+            'encryption' => env('MAIL_ENCRYPTION_ALTERNATIVE', 'tls'),
+            'username' => env('MAIL_USERNAME_ALTERNATIVE'),
+            'password' => env('MAIL_PASSWORD_ALTERNATIVE'),
+            'stream' => [
+                'ssl' => [
+                    'allow_self_signed' => true,
+                    'verify_peer' => env('MAIL_SSL_VERIFY_PEER', false),
+                ],
+            ],
             'timeout' => null,
             'auth_mode' => null,
         ],
@@ -59,7 +80,7 @@ return [
 
         'sendmail' => [
             'transport' => 'sendmail',
-            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -t -i'),
+            'path' => '/usr/sbin/sendmail -bs',
         ],
 
         'log' => [
@@ -92,8 +113,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'support@satiaserver.solucionesjmpf.com'),
+        'name' => env('MAIL_FROM_NAME', 'Satia'),
     ],
 
     /*

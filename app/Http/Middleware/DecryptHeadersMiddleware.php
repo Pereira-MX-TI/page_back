@@ -14,35 +14,46 @@ class DecryptHeadersMiddleware
     {
         try {
 
-            $headers = $request->header('info');
-            if ($headers === null) {
+            $headerInfo = $this->headerInfo($request->header('info'));
+
+            if ($headerInfo === null) {
                 throw new CustomException('info headers is required', 400);
             }
-
-            if (env('APP_ENV') == 'dev') {
-                $data = new stdClass;
-                if (is_string($headers)) {
-                    $data = json_decode($headers);
-                } else {
-                    foreach ($headers as $clave => $valor) {
-                        $data->$clave = $valor;
-                    }
-                }
-
-                return $next($request->merge(['api' => $data]));
-            }
-
-            $headers = preg_replace('/[~]/', '/', $headers);
-            $data = base64_decode($headers);
-
-            $data = json_decode(CryptoJSAES::decrypt($data, env('APP_KEY')));
-            if (is_string($data)) {
-                $data = json_decode($data);
-            }
-
-            return $next($request->merge(['api' => $data]));
+            return $next($request->merge([
+                'api' => $headerInfo,
+            ]));
         } catch (CustomException $e) {
             return response()->json(['message' => $e->getMessage()], $e->getCode());
         }
+    }
+
+    private function headerInfo($header)
+    {
+        if ($header === null) {
+            throw new CustomException('info headers is required', 400);
+        }
+
+        if (config('app.env') == 'dev') {
+            $data = new stdClass();
+            if (is_string($header)) {
+                $data = json_decode($header);
+            } else {
+                foreach ($header as $clave => $valor) {
+                    $data->$clave = $valor;
+                }
+            }
+
+            return $data;
+        }
+
+        $headers = preg_replace('/[~]/', '/', $header);
+        $data = base64_decode($headers);
+        $data = json_decode(CryptoJSAES::decrypt($data, config('app.key')));
+
+        if (is_string($data)) {
+            $data = json_decode($data);
+        }
+
+        return $data;
     }
 }

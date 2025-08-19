@@ -36,6 +36,9 @@ return [
 
         'database' => [
             'driver' => 'database',
+            // Esto se configura para que funcionen las colas, en el env se configura que se usara la base de datos
+            // mysql
+            'connection' => env('DB_CONNECTION', 'mysql'),
             'table' => 'jobs',
             'queue' => 'default',
             'retry_after' => 90,

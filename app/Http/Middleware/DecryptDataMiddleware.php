@@ -18,14 +18,13 @@ class DecryptDataMiddleware
     public function handle(Request $request, Closure $next)
     {
         try {
-
             $info = $request->input('data');
             if ($info === null) {
                 throw new CustomException('data is required', 400);
             }
 
-            if (env('APP_ENV') == 'dev') {
-                $data = new stdClass;
+            if (config('app.env') == 'dev') {
+                $data = new stdClass();
                 if (is_string($info)) {
                     $data = json_decode($info);
                 } else {
@@ -38,12 +37,15 @@ class DecryptDataMiddleware
             }
 
             if ($request->method() == 'GET') {
+
                 $info = preg_replace('/[~]/', '/', $info);
                 $data = base64_decode($info);
             } else {
                 $data = $info;
             }
-            $data = json_decode(CryptoJSAES::decrypt($data, env('APP_KEY')));
+
+            $data = json_decode(CryptoJSAES::decrypt($data, config('app.crypto_key')));
+
             if (is_string($data)) {
                 $data = json_decode($data);
             }

@@ -1,0 +1,74 @@
+<mjml>
+    <mj-head>
+        <mj-font name="Inter" href="https://fonts.googleapis.com/css?family=Inter:400,700" />
+    </mj-head>
+    <mj-body background-color="#fff">
+        <!-- Header -->
+        <mj-section background-color="#fffffe" padding="16px">
+            <mj-column width="100%">
+                <mj-image
+                    width="80px"
+                    src="https://satia-prod.s3.amazonaws.com/default/satia_alarm.jpg"
+                    alt="Logo"
+                    href="https://satia.solucionesjmpf.com/admin"
+                />
+            </mj-column>
+        </mj-section>
+        <!-- Title -->
+        <mj-section background-color="#fffffe" padding="32px">
+            <mj-column width="100%">
+                <mj-text
+                    align="center"
+                    font-size="26px"
+                    font-family="Inter, Arial, sans-serif"
+                    font-weight="700"
+                    color="#000000"
+                >
+                    ¡ Notificación de alarmas de lectura !
+                </mj-text>
+            </mj-column>
+        </mj-section>
+        <!-- Message -->
+        <mj-section background-color="#fffffe" padding="20px">
+            <mj-column width="100%">
+                <mj-text
+                    align="center"
+                    font-size="16px"
+                    font-family="Inter, Arial, sans-serif"
+                    font-weight="400"
+                    color="#777777"
+                    line-height="150%"
+                >
+                    Se ha detectado algunas alarmas en la recolección de lecturas en el transcurso del día en el conjunto
+                    "<strong>{{$data['location']['name']}}</strong>"
+                </mj-text>
+                <mj-button
+                    href="https://satia.solucionesjmpf.com/admin"
+                    background-color="#ff2500"
+                    border-radius="60px"
+                    font-family="Inter, Arial, sans-serif"
+                    font-size="14px"
+                    font-weight="700"
+                    color="#ffffff"
+                    padding="12px 0"
+                >
+                    Acceder a mi cuenta
+                </mj-button>
+            </mj-column>
+        </mj-section>
+        <!-- Footer -->
+        <mj-section background-color="#eeeeee" padding="16px">
+            <mj-column width="100%">
+                <mj-text
+                    align="center"
+                    font-size="13px"
+                    font-family="Inter, Arial, sans-serif"
+                    font-weight="400"
+                    color="#4d4d4d"
+                >
+                    Este email se ha generado de forma automática, por favor no responde a este mensaje.
+                </mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>

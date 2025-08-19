@@ -2,19 +2,52 @@
 
 return [
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cross-Origin Resource Sharing (CORS) Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure your settings for cross-origin resource sharing
+    | or "CORS". This determines what cross-origin operations may execute
+    | in web browsers. You are free to adjust these settings as needed.
+    |
+    | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+    |
+    */
+
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['POST', 'GET', 'DELETE', 'PUT', 'OPTIONS', '*'],
+    'allowed_methods' => [
+        'POST',
+        'GET',
+        'OPTIONS',
+        'PUT',
+        'PATCH',
+        'DELETE',
+    ],
 
-    'allowed_origins' => ['http://localhost:2500', '*', '*', '*, *', '*, *, *', '*'],
+    'allowed_origins' => ['*'],
+    'allowed_origins_patterns' => ['*'],
+    'Access-Control-Allow-Headers' => ['info', 'decryption'],
 
-    'allowed_origins_patterns' => [],
+    'allowed_headers' => [
+        'Content-Type',
+        'X-Auth-Token',
+        'Origin',
+        'Authorization',
+        'info',
+        'decryption',
+    ],
 
-    'allowed_headers' => ['X-Custom-Header', 'Upgrade-Insecure-Requests', 'csrftoken', 'x-csrf-token', 'CSRFToken', 'X-CSRF-TOKEN', 'Access-Control-Allow-Origin', 'content-type', 'accept', '*'],
+    'exposed_headers' => [
+        'Cache-Control',
+        'Content-Language',
+        'Content-Type',
+        'Expires',
+        'Last-Modified',
+        'Pragma',
+    ],
 
-    'exposed_headers' => ['x-custom-response-header'],
-
-    'max_age' => 0,
-
+    'max_age' => 60 * 60 * 24,
     'supports_credentials' => false,
 ];

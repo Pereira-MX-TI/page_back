@@ -4,9 +4,20 @@ services:
     image: mysql:8.0.33
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wwmedi_satia_access_test
       MYSQL_PASSWORD: root
-      MYSQL_DATABASE: soluc108_page_schp
     volumes:
       - ./data:/var/lib/mysql
     ports:
       - "3306:3306"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8090:80"
+    depends_on:
+      - db

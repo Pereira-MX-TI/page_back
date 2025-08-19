@@ -119,7 +119,7 @@ return [
          * If pdflib present in web server and auto or selected explicitely above,
          * a real license code must exist!
          */
-        // "DOMPDF_PDFLIB_LICENSE" => "your license key here",
+        //"DOMPDF_PDFLIB_LICENSE" => "your license key here",
 
         /**
          * html target media view which should be rendered into pdf.
@@ -140,7 +140,7 @@ return [
          *
          * @see CPDF_Adapter::PAPER_SIZES for valid sizes ('letter', 'legal', 'A4', etc.)
          */
-        'default_paper_size' => 'a4',
+        'default_paper_size' => 'letter',
 
         /**
          * The default font family
@@ -238,7 +238,7 @@ return [
          * Use the more-than-experimental HTML5 Lib parser
          */
         'enable_html5_parser' => false,
-        // "DOMPDF_ENABLE_PHP" => true,
+        //"DOMPDF_ENABLE_PHP" => true,
     ],
 
 ];

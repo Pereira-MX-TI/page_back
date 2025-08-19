@@ -15,6 +15,15 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'aws' => [
+        'url_image'=> 'https://satia-prod.s3.amazonaws.com/',
+        'access_key_id' => env('AWS_ACCESS_KEY_ID'),
+        'secret_access_key' => env('AWS_SECRET_ACCESS_KEY'),
+        'default_region' => env('AWS_DEFAULT_REGION'),
+        'bucket' => env('AWS_BUCKET'),
+    ],
+    'jwt_secret' => env('JWT_SECRET'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
@@ -27,6 +36,16 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
+    'crypto_key' => env('CRYPTO_KEY'),
+    'release_version' => env('RELEASE_VERSION'),
+    'documentation_access_code' => env('DOCUMENTATION_ACCESS_CODE'),
+    'email' => env('MAIL_NOTIFICATION'),
+
+    'job_consumption' => [
+        'alertWaterMeter' => 'processing_alert_water_meter',
+        'consumptionWaterMeter' => 'processing_consumption_water_meter',
+        'processLoraData' => 'processing_lora_data',
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -39,7 +58,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', true),
+    'debug' => (bool) env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -119,8 +138,7 @@ return [
     |
     */
 
-    'key' => env('APP_KEY'),
-
+    'key' => env('CRYPTO_KEY'),
     'cipher' => 'AES-256-CBC',
 
     /*
@@ -161,8 +179,6 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
-        Barryvdh\DomPDF\ServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -173,10 +189,13 @@ return [
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        //Blocktrail\CryptoJSAES\CryptoJSAES::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
+        Knuckles\Scribe\ScribeServiceProvider::class,
     ],
 
     /*
@@ -191,7 +210,6 @@ return [
     */
 
     'aliases' => [
-
         'App' => Illuminate\Support\Facades\App::class,
         'Arr' => Illuminate\Support\Arr::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
@@ -211,7 +229,6 @@ return [
         'Gate' => Illuminate\Support\Facades\Gate::class,
         'Hash' => Illuminate\Support\Facades\Hash::class,
         'Http' => Illuminate\Support\Facades\Http::class,
-        'Js' => Illuminate\Support\Js::class,
         'Lang' => Illuminate\Support\Facades\Lang::class,
         'Log' => Illuminate\Support\Facades\Log::class,
         'Mail' => Illuminate\Support\Facades\Mail::class,
@@ -232,7 +249,6 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
-
     ],
 
 ];
